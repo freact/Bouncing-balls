@@ -1,0 +1,15 @@
+{
+  "short_name": "Bounce",
+  "name": "Bouncing Circles App",
+  "icons": [
+    {
+      "src": "https://via.placeholder.com/192",
+      "type": "image/png",
+      "sizes": "192x192"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#1a1a1a",
+  "display": "standalone",
+  "theme_color": "#1a1a1a"
+}
