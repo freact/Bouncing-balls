@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bouncing Circles</title>
+    <style>
+        body { margin: 0; overflow: hidden; background: #1a1a1a; }
+        canvas { display: block; }
+        .instructions {
+            position: absolute; top: 10px; left: 10px;
+            color: white; font-family: sans-serif; pointer-events: none;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="instructions">Tap or Click to add circles!</div>
+    <canvas id="canvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let circles = [];
+
+        // Resize canvas to fill window
+        function resize() {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener('resize', resize);
+        resize();
+
+        class Circle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = Math.random() * 20 + 10;
+                // Random velocity between -4 and 4
+                this.dx = (Math.random() - 0.5) * 8;
+                this.dy = (Math.random() - 0.5) * 8;
+                this.color = `hsl(${Math.random() * 360}, 70%, 60%)`;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.closePath();
+            }
+
+            update() {
+                // Bounce off left/right walls
+                if (this.x + this.radius > width || this.x - this.radius < 0) {
+                    this.dx = -this.dx;
+                }
+                // Bounce off top/bottom walls
+                if (this.y + this.radius > height || this.y - this.radius < 0) {
+                    this.dy = -this.dy;
+                }
+
+                this.x += this.dx;
+                this.y += this.dy;
+
+                this.draw();
+            }
+        }
+
+        function spawn(e) {
+            // Support both mouse clicks and touch taps
+            const x = e.clientX || e.touches[0].clientX;
+            const y = e.clientY || e.touches[0].clientY;
+            circles.push(new Circle(x, y));
+        }
+
+        window.addEventListener('mousedown', spawn);
+        window.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Prevents zooming on double tap
+            spawn(e);
+        }, { passive: false });
+
+        // Initial circles
+        for(let i = 0; i < 5; i++) {
+            circles.push(new Circle(width / 2, height / 2));
+        }
+
+        function animate() {
+            // Semi-transparent clear creates a slight "trail" effect
+            ctx.fillStyle = 'rgba(26, 26, 26, 0.3)';
+            ctx.fillRect(0, 0, width, height);
+
+            circles.forEach(circle => circle.update());
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
+</body>
+</html>
